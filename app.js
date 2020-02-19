@@ -1,10 +1,12 @@
 const express = require('express');
 // Application Dependencies
 
-app.use(cors());
 const cors = require('cors');
+require('dotenv').config();
+
 const app = express();
 // get the port on which to run the server
+app.use(cors());
 
 const geoData = require('./data/geo.json');
 const request = require('superagent');
@@ -15,32 +17,28 @@ let lat;
 let lng;
 
 
-function getLatLong(location) {
-    // simulate an error if special "bad location" is provided:
-    if (location === 'bad location') {
-        throw new Error();
-    }
-    // convert to data format
-    return toLocation(geoData);
-}
 
-function toLocation() {
-    const locationResult = geoData.results[0];
-    //${searchterm}
-    const geometry = locationResult.geometry;
-    return {
-        formatted_query: locationResult.formatted_address,
-        latitude: geometry.location.lat,
-        longitude: geometry.location.lng
-    };
-}
+// function toLocation(geoData) {
+//     const searchQuery = request.query.search;
+//     console.log(searchQuery);
+//     const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
+
+//     const locationResult = request.get(`https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${searchQuery}&format=json`);
+
+//     const firstResult = locationResult.body[0];
+//     return {
+//         formatted_query: firstResult.display_name,
+//         latitude: firstResult.lat,
+//         longitude: firstResult.lon
+//     };
+// }
 async function getWeather(lat, lng) {
-    //https://api.darksky.net/forecast/dae342dd4e94b99bd975455ffef63010/37.8267,-122.4233
-    // URL with API key ${lat,lng}
-    const weatherData = await request.get(`https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${lat},${lng}`);
+    const DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
+
+    const weatherData = await request.get(`https://api.darksky.net/forecast/${DARKSKY_API_KEY}/${lat},${lng}`);
     
-    return request.get(weatherData).then(response => {
-        return formatWeather(response);
+    return request.get(weatherData).then(respond => {
+        return formatWeather(respond);
     });
 }
 function formatWeather(weatherData){
@@ -54,20 +52,31 @@ function formatWeather(weatherData){
 // API Routes
 // app.<verb>(<noun>, handler);
 // location route
-app.get('/location', (request, response) => {
-
-    const location = request.query.location;
-    const latLngResult = getLatLong(location);
-    response.json(latLngResult);
-
+app.get('/location', (request, respond) => {
+    try { 
+        const searchQuery = request.query.search;
+        const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
+    
+        const locationResult = request.get(`https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${searchQuery}&format=json`);
+        console.log(locationResult);
+        const firstResult = locationResult.body[0];
+        return {
+            formatted_query: firstResult.display_name,
+            latitude: firstResult.lat,
+            longitude: firstResult.lon
+        };
+    }
+    catch (err){
+        respond.status(500).send('Sorry something went wrong, please try again');
+    }
 });
 // weather route
-app.get('/weather', (request, response) => {
+app.get('/weather', (request, respond) => {
     const lat = request.query.weather;
-    const lng = ;
+    // const lng = ;
 
     const weatherResult = getWeather(lat, lng);
-    response.json(weatherResult);
+    respond.json(weatherResult);
 
 });
 
