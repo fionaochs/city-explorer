@@ -1,43 +1,62 @@
 const express = require('express');
+// Application Dependencies
 
 const app = express();
-const geoJSON = require('./data/geo.json');
-const superagent = require('superagent');
+// get the port on which to run the server
 
+const geoData = require('./data/geo.json');
+const request = require('superagent');
+// const weatherData = require('./data/darksky.json');
 const port = process.env.PORT || 3000;
 
-let lat;
-let long;
 
-const formatLocationResponse = locationItem => {
-    const {
-        geometry: {
-            location: {
-                lat,
-                long,
-            }
-        },
-        formattedAddress,
-    } = locationItem;
 
+function toLocation() {
+    const firstResult = geoData.results[0];
+    //${searchterm}
+    const geometry = firstResult.geometry;
+    return {
+        formatted_query: firstResult.formatted_address,
+        latitude: geometry.location.lat,
+        longitude: geometry.location.lng
+    };
+}
+
+function getLatLong(location) {
+    // simulate an error if special "bad location" is provided:
+    if (location === 'bad location') {
+        throw new Error();
+    }
+    // convert to data format
+    return toLocation(geoData);
+}
+
+function getWeather(lat, lng) {
+    const weatherData = ;
+    // URL with API key ${lat,lng}
+    return request.get(URL)
+    .then(response => {
+        return formatWeather(response);
+    });
+}
+function formatWeather(){
 
     return {
-        'formatted_query': formattedAddress,
-        'latitude': lat,
-        'longitude': long
-    };
-};
+        "forecast": "Partly cloudy until afternoon.",
+        "time": "Mon Jan 01 2001"
+      }
+}
 
-const getWeatherResponse = async (lat, long) => {
-    const weatherData = await superagent.get(`https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${lat},${long}`);
-    return {
-        'forecast': 'Mostly cloudy in the morning.',
-        'time': 'Tue Jan 02 2001'
-    };
-};
-app.get('/location', (rec, res) => {
-    const searchQuery = req.query.search;
+// API Routes
+// app.<verb>(<noun>, handler);
+app.get('/location', (request, response) => {
 
-    const response = formatLocationResponse(item);
-    res.json(response);
+    const location = request.query.location;
+    const result = getLatLong(location);
+    response.status(200).json(result);
+
+});
+
+app.listen(port, () => {
+    console.log('server running', port);
 });
