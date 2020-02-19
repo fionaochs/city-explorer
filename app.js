@@ -52,22 +52,22 @@ function formatWeather(weatherData){
 // API Routes
 // app.<verb>(<noun>, handler);
 // location route
-app.get('/location', (request, respond) => {
+app.get('/location', async(req, respond, next) => {
     try { 
-        const searchQuery = request.query.search;
+        const searchQuery = req.query.search;
         const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
-    
-        const locationResult = request.get(`https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${searchQuery}&format=json`);
-        console.log(locationResult);
+   
+        const locationResult = await request.get(`https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${searchQuery}&format=json`);
+        
         const firstResult = locationResult.body[0];
-        return {
+        respond.json({
             formatted_query: firstResult.display_name,
             latitude: firstResult.lat,
             longitude: firstResult.lon
-        };
+        }); 
     }
     catch (err){
-        respond.status(500).send('Sorry something went wrong, please try again');
+        next(err);
     }
 });
 // weather route
