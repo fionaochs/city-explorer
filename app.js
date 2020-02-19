@@ -32,22 +32,22 @@ let lng;
 //         longitude: firstResult.lon
 //     };
 // }
-async function getWeather(lat, lng) {
-    const DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
+// async function getWeather(lat, lng) {
+//     const DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
 
-    const weatherData = await request.get(`https://api.darksky.net/forecast/${DARKSKY_API_KEY}/${lat},${lng}`);
+//     const weatherData = await request.get(`https://api.darksky.net/forecast/${DARKSKY_API_KEY}/${lat},${lng}`);
     
-    return request.get(weatherData).then(respond => {
-        return formatWeather(respond);
-    });
-}
-function formatWeather(weatherData){
-    const weatherInfo = weatherData.daily.data[0];
-    return {
-        'forecast': weatherInfo.summary,
-        'time': new Date(weatherInfo.time * 1000).toDateString()
-    };
-}
+//     return request.get(weatherData).then(respond => {
+//         return formatWeather(respond);
+//     });
+// }
+// function formatWeather(weatherData){
+//     const weatherInfo = weatherData.daily.data[0];
+//     return {
+//         'forecast': weatherInfo.summary,
+//         'time': new Date(weatherInfo.time * 1000).toDateString()
+//     };
+// }
 
 // API Routes
 // app.<verb>(<noun>, handler);
@@ -71,11 +71,19 @@ app.get('/location', async(req, respond, next) => {
     }
 });
 // weather route
-app.get('/weather', (request, respond) => {
+app.get('/weather', async(request, respond) => {
+    const DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
+    const weatherData = await request.get(`https://api.darksky.net/forecast/${DARKSKY_API_KEY}/${lat},${lng}`);
+
     const lat = request.query.weather;
     // const lng = ;
+    const weatherInfo = weatherData.daily.data[0];
+    return {
+        'forecast': weatherInfo.summary,
+        'time': new Date(weatherInfo.time * 1000).toDateString()
+    };
 
-    const weatherResult = getWeather(lat, lng);
+    // const weatherResult = getWeather(lat, lng);
     respond.json(weatherResult);
 
 });
