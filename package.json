@@ -1,0 +1,34 @@
+{
+  "name": "first-node-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest --detectOpenHandles",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "env": "0.0.2",
+    "express": "^4.17.1",
+    "fs-extra": "^8.1.0",
+    "jest": "^25.1.0",
+    "nodemon": "^2.0.2",
+    "supertest": "^4.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fionaochs/city-explorer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fionaochs/city-explorer/issues"
+  },
+  "homepage": "https://github.com/fionaochs/city-explorer#readme"
+}
