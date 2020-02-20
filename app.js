@@ -81,7 +81,7 @@ app.get('/weather', async(req, response, next) => {
 // };
 
 
-app.get('/yelp', async(req, response, next) => {
+app.get('/reviews', async(req, response, next) => {
     try { 
         const yelpData = await request
             .get(`https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lng}`)
@@ -104,7 +104,7 @@ app.get('/yelp', async(req, response, next) => {
     }
 });
 
-app.get('/event', async(req, response, next) => {
+app.get('/events', async(req, response, next) => {
     try {
         const eventfulData = await request.get(`http://api.eventful.com/json/events/search?app_key=${process.env.EVENT_API_KEY}&where=${lat},${lng}&within=25&page_size=20&page_number=1`);
         const eventData = JSON.parse(eventfulData.text); 
