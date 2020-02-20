@@ -107,26 +107,28 @@ app.get('/yelp', async(req, response, next) => {
     }
 });
 
-// app.get('/event', async(req, response, next) => {
-//     try {
-//         const EVENTFUL_API_KEY = process.env.EVENTFUL_API_KEY;
-//         const eventfulData = await request.get(`http://api.eventful.com/rest/events/search?...&${lat},${lng}&within=25`);
-//         const eventData = eventfulData. 
-//         const events = eventData.map(event => {
-//             return {
-//                 "link": event.link,
-//                 "name": event.name,
-//                 "event_date": event.event_date,
-//                 "summary": event.summary
-//               }
-//         });
-//         response.json(events);
+app.get('/event', async(req, response, next) => {
+    try {
+        const EVENT_API_KEY = process.env.EVENT_API_KEY;
+        const eventfulData = await request.get(`http://api.eventful.com/json/events/search?app_key=${EVENT_API_KEY}&where=${lat},${lng}&within=25&page_size=20&page_number=1`);
+        const eventData = JSON.parse(eventfulData.text); 
+//data comes back as string so parse to change, no body but has text
+        const events = eventData.events.event.map(event => {
+            return {
+                'link': event.url,
+                'name': event.title,
+                'event_date': event.start_time,
+                'summary': event.description
+            };
+        });
+        response.json(events);
 
-//     }
-//     catch (err){
-//         next(err);
-//     }
-// });
+    }
+    catch (err){
+        next(err);
+    }
+});
+
 
 app.get('/trails', async(req, response, next) => {
     try {
@@ -148,7 +150,6 @@ app.get('/trails', async(req, response, next) => {
             };
         });
         response.json(hikes);
-
     }
     catch (err){
         next(err);
