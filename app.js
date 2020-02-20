@@ -58,11 +58,13 @@ app.get('/weather', async(req, response, next) => {
     try { 
         const weatherData = await request.get(`https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${lat},${lng}`);
 
-        const weatherInfo = weatherData.daily.data[0];
-        response.json({ 
-            'forecast': weatherInfo.summary,
-            'time': new Date(weatherInfo.time * 1000).toDateString()
+        const weatherResults = weatherData.body.daily.data.map(forecast => {
+            return {
+                forecast: forecast.summary,
+                time: new Date(forecast.time * 1000).toDateString()
+            };
         });
+        response.json(weatherResults);
     }
     catch (err){
         next(err);
