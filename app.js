@@ -1,15 +1,15 @@
+require('dotenv').config();
 const express = require('express');
 // Application Dependencies
 
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
 // get the port on which to run the server
 app.use(cors());
 
 const request = require('superagent');
-const port = process.env.PORT || 3000;
+// const port = process.env.PORT || 3000;
 
 let lat;
 let lng;
@@ -17,9 +17,8 @@ let lng;
 app.get('/location', async(req, response, next) => {
     try {
         const searchQuery = req.query.search;
-        const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
     
-        const locationResult = await request.get(`https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${searchQuery}&format=json`);
+        const locationResult = await request.get(`https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${searchQuery}&format=json`);
     
         const firstResult = locationResult.body[0];
   
@@ -57,8 +56,7 @@ app.get('/location', async(req, response, next) => {
 
 app.get('/weather', async(req, response, next) => {
     try { 
-        const DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
-        const weatherData = await request.get(`https://api.darksky.net/forecast/${DARKSKY_API_KEY}/${lat},${lng}`);
+        const weatherData = await request.get(`https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${lat},${lng}`);
 
         const weatherInfo = weatherData.daily.data[0];
         response.json({ 
@@ -85,10 +83,9 @@ app.get('/weather', async(req, response, next) => {
 
 app.get('/yelp', async(req, response, next) => {
     try { 
-        const YELP_API_KEY = process.env.YELP_API_KEY;
         const yelpData = await request
             .get(`https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lng}`)
-            .set('Authorization', `Bearer ${YELP_API_KEY}`);
+            .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`);
 
         const yelpInfo = yelpData.body;
         const yelpBusinesses = yelpInfo.businesses.map(business => {
@@ -109,8 +106,7 @@ app.get('/yelp', async(req, response, next) => {
 
 app.get('/event', async(req, response, next) => {
     try {
-        const EVENT_API_KEY = process.env.EVENT_API_KEY;
-        const eventfulData = await request.get(`http://api.eventful.com/json/events/search?app_key=${EVENT_API_KEY}&where=${lat},${lng}&within=25&page_size=20&page_number=1`);
+        const eventfulData = await request.get(`http://api.eventful.com/json/events/search?app_key=${process.env.EVENT_API_KEY}&where=${lat},${lng}&within=25&page_size=20&page_number=1`);
         const eventData = JSON.parse(eventfulData.text); 
 //data comes back as string so parse to change, no body but has text
         const events = eventData.events.event.map(event => {
@@ -132,8 +128,7 @@ app.get('/event', async(req, response, next) => {
 
 app.get('/trails', async(req, response, next) => {
     try {
-        const HIKING_API_KEY = process.env.HIKING_API_KEY;
-        const hikingData = await request.get(`https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lng}&maxDistance=10&key=${HIKING_API_KEY}`);
+        const hikingData = await request.get(`https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lng}&maxDistance=10&key=${process.env.HIKING_API_KEY}`);
         const hikeData = hikingData.body;
         const hikes = hikeData.trails.map(hike => {
             return {
@@ -159,6 +154,10 @@ app.get('/trails', async(req, response, next) => {
 
 
 // need to listen to see if port running
-app.listen(port, () => {
-    console.log('server running', port);
-});
+// app.listen(port, () => {
+//     console.log('server running', port);
+// });
+
+module.exports = {
+    app: app
+};

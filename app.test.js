@@ -2,23 +2,18 @@ const { app } = require('./app.js');
 const request = require('supertest');
 
 describe('/GET /location', () => {
-    test('It should respond with an object with location properties',
-    // get the done function to call after the test
+    test('Test location API response',
         async(done) => {
-            // feed our express app to the supertest request
             const response = await request(app)
-                // and hit out express app's about route with a /GET
-                .get('/location');
-            // check to see if the response is what we expect
+                .get('/location?search=portland')
+                .expect('Content-Type', /json/);
+           
             expect(response.body).toEqual({
-                // it should have this name
-                formatted_query: firstResult.display_name,
-                latitude: firstResult.lat,
-                longitude: firstResult.lng
+                formatted_query: 'Portland, Multnomah County, Oregon, USA', 
+                latitude: '45.5202471', 
+                longitude: '-122.6741949'
             });
-            // it should have a status of 200
             expect(response.statusCode).toBe(200);
-            // the callback has a 'done' that we can call to fix stuff :sparkle-emoji:
             done();
         });
 });
